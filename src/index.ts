@@ -71,10 +71,7 @@ const assertAuthenticated: Middleware = (data, context, next) => {
  * TODO: Send push notifications to players in the game
  */
 exports.startGame = onCall(
-  withMiddlewares(
-    [assertAuthenticated],
-    async (data: any, context: CallableContext) => startGame(data, context)
-  )
+  withMiddlewares([assertAuthenticated], async (data: any) => startGame(data))
 );
 
 /**
