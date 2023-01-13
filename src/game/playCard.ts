@@ -16,8 +16,10 @@ const playCard = async (
   { gameId, cardId, targetUid }: IPlayCard,
   context: CallableContext
 ) => {
+  console.log(gameId, cardId, targetUid);
+
   // Make sure all args are present
-  if (!gameId || !cardId || !targetUid) {
+  if (gameId == null || cardId == null || targetUid == null) {
     throw new HttpsError(
       "invalid-argument",
       "missing argument for function playCard()"
@@ -67,8 +69,15 @@ const playCard = async (
   // This logic will have to change if we change the way turns work
   //  (i.e. targeted players next, random player next, etc.)
   if (nextPlayer.cards.length === 0) {
+    //  Change game status to over
     game.gameStatus = GameStatus.isOver;
+
+    // Save in firestore
     await gameRef.set(game);
+
+    // Send game over notification
+    sendGameOverNotification(game);
+
     return { success: true };
   }
 
@@ -150,6 +159,17 @@ const sendCardPlayedNotification = (
     players: notificationPlayers,
     title: `Something happened in ${game.displayName}`,
     body: `${currPlayerDisplayName} just went! It's ${nextPlayerDisplayName}'s turn.`,
+  });
+};
+
+const sendGameOverNotification = (game: Game) => {
+  const { playerIds } = game;
+
+  // Send push notification for players in this game
+  sendPushNotification({
+    players: playerIds,
+    title: `${game.displayName} is over!`,
+    body: "Boooo!",
   });
 };
 
