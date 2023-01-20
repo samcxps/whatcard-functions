@@ -42,3 +42,6 @@ export const getGame = async (gameId: string): Promise<IGetGameResponse> => {
     return { hasError: true, error };
   }
 };
+
+export const isUserInGame = (game: Game, playerId: string) =>
+  game.playerIds.find((id) => id === playerId);

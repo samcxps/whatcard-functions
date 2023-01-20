@@ -6,7 +6,7 @@ import {
   onCall,
   type CallableContext,
 } from "firebase-functions/v1/https";
-import { startGame, playCard } from "./game";
+import { startGame, playCard, joinGame } from "./game";
 
 admin.initializeApp();
 
@@ -66,18 +66,23 @@ const assertAuthenticated: Middleware = (data, context, next) => {
  * Start a whatcard game
  *
  * Changes game status to in progress, sets random turn order,
- *  deals cards from chosen card pack
- *
- * TODO: Send push notifications to players in the game
+ *  deals cards from chosen card pack, sends players notifications
  */
 exports.startGame = onCall(
   withMiddlewares([assertAuthenticated], async (data: any) => startGame(data))
 );
 
 /**
- * Play a card for user
+ * Join a whatcard game
  *
- * TODO: Send push notifications to players in the game
+ * Adds user to game and sends other players notifications
+ */
+exports.joinGame = onCall(
+  withMiddlewares([assertAuthenticated], async (data: any) => joinGame(data))
+);
+
+/**
+ * Play a card for user
  */
 exports.playCard = onCall(
   withMiddlewares(
